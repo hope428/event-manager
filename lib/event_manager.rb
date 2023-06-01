@@ -37,9 +37,14 @@ def save_thank_you_letter(id, form_letter)
 end
 
 def clean_phone(phone_number)
-    if phone_number < 10
-        nil
-    elsif phone_number
+    phone_number.gsub!(/[^\d]/, '')
+    if phone_number.length == 10
+        phone_number
+    elsif phone_number.length == 11 && phone_number[0] == 1
+        phone_number[1..10]
+    else
+        "Bad phone number!"
+    end
 end
 
 contents = CSV.open('event_attendees.csv', headers: true, header_converters: :symbol)
@@ -47,7 +52,7 @@ contents.each do |row|
     id = row[0]
     name = row[:first_name]
     zipcode = clean_zipcode(row[:zipcode])
-    phone = row[:homephone]
+    phone = clean_phone(row[:homephone])
 
     legislators = display_legislators(zipcode)
     
